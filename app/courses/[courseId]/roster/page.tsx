@@ -10,6 +10,8 @@ import {
   List,
   ChevronDown,
   MoreHorizontal,
+  MessageSquare,
+  Mail,
 } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -24,9 +26,11 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useData } from "@/lib/data-context"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import type { DiscussionSendMode } from "@/lib/types"
 
 interface RosterPageProps {
   params: Promise<{ courseId: string }>
@@ -39,6 +43,7 @@ export default function RosterPage({ params }: RosterPageProps) {
   const [selectedMembers, setSelectedMembers] = useState<string[]>([])
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false)
   const [messageContent, setMessageContent] = useState("")
+  const [sendMode, setSendMode] = useState<DiscussionSendMode>("message")
 
   const { getCourse, getRosterForCourse } = useData()
 
@@ -69,14 +74,28 @@ export default function RosterPage({ params }: RosterPageProps) {
 
   const handleSendMessage = () => {
     if (messageContent.trim() && selectedMembers.length > 0) {
-      toast.success(
-        `Message sent to ${selectedMembers.length} recipient${
-          selectedMembers.length > 1 ? "s" : ""
-        }!`
-      )
+      const n = selectedMembers.length
+      const r = n === 1 ? "" : "s"
+      if (sendMode === "message") {
+        toast.success(`Course message sent to ${n} recipient${r}.`)
+      } else if (sendMode === "email") {
+        toast.success(`Email sent via Outlook to ${n} recipient${r}.`)
+      } else {
+        toast.success(
+          `Course message and Outlook email sent to ${n} recipient${r}.`
+        )
+      }
       setMessageContent("")
+      setSendMode("message")
       setSelectedMembers([])
       setIsMessageDialogOpen(false)
+    }
+  }
+
+  const handleMessageDialogOpenChange = (open: boolean) => {
+    setIsMessageDialogOpen(open)
+    if (!open) {
+      setSendMode("message")
     }
   }
 
@@ -223,15 +242,18 @@ export default function RosterPage({ params }: RosterPageProps) {
         </div>
       </div>
 
-      <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog
+        open={isMessageDialogOpen}
+        onOpenChange={handleMessageDialogOpenChange}
+      >
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Message or Email</DialogTitle>
+            <DialogTitle>Message course members</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium">Recipients</label>
-              <div className="mt-1 flex flex-wrap items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-2 min-h-10">
+              <div className="mt-1 flex min-h-10 flex-wrap items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-2">
                 {selectedMemberNames.slice(0, 3).map((name, index) => (
                   <Badge key={index} variant="secondary">
                     {name}
@@ -253,8 +275,60 @@ export default function RosterPage({ params }: RosterPageProps) {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium">Message</label>
+              <div className="mb-1.5 text-sm font-medium">Send using</div>
+              <ToggleGroup
+                type="single"
+                value={sendMode}
+                onValueChange={(v) => {
+                  if (v) setSendMode(v as DiscussionSendMode)
+                }}
+                variant="outline"
+                size="sm"
+                className="flex w-full flex-col gap-2 sm:flex-row sm:gap-0"
+              >
+                <ToggleGroupItem
+                  value="message"
+                  aria-label="Send as course message only"
+                  className="flex min-h-[4.25rem] flex-1 flex-col justify-center gap-1 px-2 py-2 text-center text-xs leading-tight data-[state=on]:bg-purple-50 data-[state=on]:text-purple-900"
+                >
+                  <MessageSquare className="mx-auto h-4 w-4 shrink-0" />
+                  <span>Send as message</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="email"
+                  aria-label="Send as email via Outlook"
+                  className="flex min-h-[4.25rem] flex-1 flex-col justify-center gap-1 px-2 py-2 text-center text-xs leading-tight data-[state=on]:bg-purple-50 data-[state=on]:text-purple-900"
+                >
+                  <Mail className="mx-auto h-4 w-4 shrink-0" />
+                  <span>Send as email (Outlook)</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="both"
+                  aria-label="Send as message and Outlook email"
+                  className="flex min-h-[4.25rem] flex-1 flex-col justify-center gap-1 px-2 py-2 text-center text-xs leading-tight data-[state=on]:bg-purple-50 data-[state=on]:text-purple-900"
+                >
+                  <span className="flex items-center justify-center gap-0.5">
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    <Mail className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Both</span>
+                </ToggleGroupItem>
+              </ToggleGroup>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {sendMode === "message" &&
+                  "Delivers in the course messages inbox only (no email)."}
+                {sendMode === "email" &&
+                  "Opens or sends through your Outlook email to recipients’ addresses."}
+                {sendMode === "both" &&
+                  "Posts to course messages and sends a copy by Outlook email."}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium" htmlFor="roster-message">
+                Message
+              </label>
               <Textarea
+                id="roster-message"
                 className="mt-1"
                 rows={5}
                 placeholder="Type your message here..."
@@ -266,7 +340,7 @@ export default function RosterPage({ params }: RosterPageProps) {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsMessageDialogOpen(false)}
+              onClick={() => handleMessageDialogOpenChange(false)}
             >
               Cancel
             </Button>
