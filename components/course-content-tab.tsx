@@ -18,6 +18,7 @@ import {
   ClipboardList,
 } from "lucide-react"
 import type { Course, ContentItem } from "@/lib/types"
+import { useData } from "@/lib/data-context"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
@@ -27,6 +28,21 @@ interface CourseContentTabProps {
 }
 
 export function CourseContentTab({ course, contentItems }: CourseContentTabProps) {
+  const { getAssignmentsForCourse } = useData()
+  const assignments = getAssignmentsForCourse(course.id)
+
+  const now = new Date()
+  const dueSoon = assignments.filter((a) => {
+    const diff = new Date(a.dueDateISO).getTime() - now.getTime()
+    return diff > 0 && diff <= 48 * 60 * 60 * 1000
+  })
+  const due24 = dueSoon.filter(
+    (a) => new Date(a.dueDateISO).getTime() - now.getTime() <= 24 * 60 * 60 * 1000
+  )
+  const due48 = dueSoon.filter(
+    (a) => new Date(a.dueDateISO).getTime() - now.getTime() > 24 * 60 * 60 * 1000
+  )
+
   const getIcon = (type: ContentItem["type"]) => {
     switch (type) {
       case "link":
@@ -147,6 +163,56 @@ export function CourseContentTab({ course, contentItems }: CourseContentTabProps
             </div>
           </div>
         </div>
+
+        {dueSoon.length > 0 && (
+          <div className="mt-4 rounded-lg border border-zinc-200 bg-white p-4">
+            <h3 className="mb-3 font-medium">Due Soon</h3>
+            <div className="space-y-3">
+              {due24.length > 0 && (
+                <div>
+                  <div className="mb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    24 hours
+                  </div>
+                  <div className="space-y-2">
+                    {due24.map((assignment) => (
+                      <Link
+                        key={assignment.id}
+                        href={`/courses/${course.id}/assignments/${assignment.id}`}
+                        className="flex items-start gap-2 text-sm"
+                      >
+                        <FileText className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                        <div className="font-medium text-foreground hover:underline">
+                          {assignment.title}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {due48.length > 0 && (
+                <div>
+                  <div className="mb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    48 hours
+                  </div>
+                  <div className="space-y-2">
+                    {due48.map((assignment) => (
+                      <Link
+                        key={assignment.id}
+                        href={`/courses/${course.id}/assignments/${assignment.id}`}
+                        className="flex items-start gap-2 text-sm"
+                      >
+                        <FileText className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                        <div className="font-medium text-foreground hover:underline">
+                          {assignment.title}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 rounded-lg border border-zinc-200 bg-white p-4">
           <h3 className="mb-3 font-medium">Course Schedule</h3>
