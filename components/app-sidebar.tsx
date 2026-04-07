@@ -19,14 +19,14 @@ import { cn } from "@/lib/utils"
 import { useData } from "@/lib/data-context"
 
 const navItems = [
-  { icon: Home, label: "Institution Page", href: "#" },
-  { icon: Activity, label: "Activity", href: "#" },
+  { icon: Home, label: "Institution Page", href: "/not-found" },
+  { icon: Activity, label: "Activity", href: "/not-found" },
   { icon: BookOpen, label: "Courses", href: "/" },
-  { icon: Calendar, label: "Calendar", href: "#" },
-  { icon: Mail, label: "Messages", href: "#" },
-  { icon: FileText, label: "Grades", href: "#" },
-  { icon: Sparkles, label: "Assist", href: "#" },
-  { icon: Wrench, label: "Tools", href: "#" },
+  { icon: Calendar, label: "Calendar", href: "/not-found" },
+  { icon: Mail, label: "Messages", href: "/not-found" },
+  { icon: FileText, label: "Grades", href: "/not-found" },
+  { icon: Sparkles, label: "Assist", href: "/not-found" },
+  { icon: Wrench, label: "Tools", href: "/not-found" },
 ]
 
 export function AppSidebar() {
