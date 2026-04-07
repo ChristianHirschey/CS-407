@@ -23,12 +23,22 @@ export function CourseCard({ course }: CourseCardProps) {
           <span className="text-xs text-muted-foreground">
             {course.term.slice(0, 5)}.{course.term}
           </span>
-          <Link
-            href={`/courses/${course.id}`}
-            className="font-medium text-foreground hover:underline"
-          >
-            {course.code}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/courses/${course.id}`}
+              className="font-medium text-foreground hover:underline"
+            >
+              {course.code}
+            </Link>
+            {upcomingAssignment && (
+              <Link
+                href={`/courses/${course.id}/assignments/${upcomingAssignment.id}`}
+                className="text-sm text-orange-600 font-medium underline"
+              >
+                {upcomingAssignment.title} Due Soon!
+              </Link>
+            )}
+          </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="text-zinc-900">Open</span>
             <span>|</span>
@@ -40,14 +50,6 @@ export function CourseCard({ course }: CourseCardProps) {
               More info <ChevronDown className="h-3 w-3" />
             </button>
           </div>
-          {upcomingAssignment && (
-            <Link
-              href={`/courses/${course.id}/assignments/${upcomingAssignment.id}`}
-              className="mt-1 text-sm text-orange-600 font-medium hover:underline"
-            >
-              {upcomingAssignment.title} Due Soon!
-            </Link>
-          )}
         </div>
         <button
           onClick={() => toggleFavorite(course.id)}
