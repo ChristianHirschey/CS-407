@@ -39,6 +39,7 @@ export default function RosterPage({ params }: RosterPageProps) {
   const [selectedMembers, setSelectedMembers] = useState<string[]>([])
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false)
   const [messageContent, setMessageContent] = useState("")
+  const [messageType, setMessageType] = useState<"message" | "email">("message")
 
   const { getCourse, getRosterForCourse } = useData()
 
@@ -226,9 +227,33 @@ export default function RosterPage({ params }: RosterPageProps) {
       <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Message or Email</DialogTitle>
+            <DialogTitle>New Message</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="flex rounded-md border border-zinc-200 overflow-hidden">
+              <button
+                className={cn(
+                  "flex-1 py-2 text-sm font-medium transition-colors",
+                  messageType === "message"
+                    ? "bg-purple-600 text-white"
+                    : "bg-white text-muted-foreground hover:bg-zinc-50"
+                )}
+                onClick={() => setMessageType("message")}
+              >
+                Message
+              </button>
+              <button
+                className={cn(
+                  "flex-1 py-2 text-sm font-medium transition-colors",
+                  messageType === "email"
+                    ? "bg-purple-600 text-white"
+                    : "bg-white text-muted-foreground hover:bg-zinc-50"
+                )}
+                onClick={() => setMessageType("email")}
+              >
+                Email
+              </button>
+            </div>
             <div>
               <label className="text-sm font-medium">Recipients</label>
               <div className="mt-1 flex flex-wrap items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-2 min-h-10">
