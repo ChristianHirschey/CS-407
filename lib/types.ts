@@ -96,6 +96,7 @@ export interface Assignment {
   title: string
   description: string
   dueDate: string
+  dueDateISO: string
   maxPoints: number
   attempts: string
   type: "individual" | "group"
