@@ -38,6 +38,7 @@ export default function DiscussionPage({ params }: DiscussionPageProps) {
     getDiscussion,
     getPostsForDiscussion,
     addPost,
+    markDiscussionRead,
     markAllPostsReadForDiscussion,
   } = useData()
 
@@ -57,6 +58,7 @@ export default function DiscussionPage({ params }: DiscussionPageProps) {
   }
 
   const handleMarkAllRead = () => {
+    markDiscussionRead(discussionId)
     markAllPostsReadForDiscussion(discussionId)
   }
 
@@ -97,7 +99,7 @@ export default function DiscussionPage({ params }: DiscussionPageProps) {
                     variant="outline"
                     size="sm"
                     onClick={handleMarkAllRead}
-                    disabled={newPostsCount === 0}
+                    disabled={newPostsCount === 0 && discussion.isCompleted}
                   >
                     Mark all as Read
                   </Button>
