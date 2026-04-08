@@ -53,6 +53,8 @@ interface DataContextType {
   getDiscussion: (id: string) => Discussion | undefined
   getPostsForDiscussion: (discussionId: string) => DiscussionPost[]
   addPost: (discussionId: string, content: string) => void
+  markDiscussionRead: (id: string) => void
+  markAllDiscussionsReadForCourse: (courseId: string) => void
   markAllPostsReadForDiscussion: (discussionId: string) => void
   
   // Assignment helpers
@@ -78,7 +80,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [courses, setCourses] = useState<Course[]>(initialCourses)
   const [contentItems] = useState<ContentItem[]>(initialContent)
   const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements)
-  const [discussions] = useState<Discussion[]>(initialDiscussions)
+  const [discussions, setDiscussions] = useState<Discussion[]>(initialDiscussions)
   const [discussionPosts, setDiscussionPosts] = useState<DiscussionPost[]>(initialPosts)
   const [rosterMembers] = useState<RosterMember[]>(initialRoster)
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
@@ -137,6 +139,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setDiscussionPosts((prev) => [newPost, ...prev])
   }
 
+  const markDiscussionRead = (id: string) => {
+    setDiscussions((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, isCompleted: true } : d))
+    )
+  }
+
+  const markAllDiscussionsReadForCourse = (courseId: string) => {
+    setDiscussions((prev) =>
+      prev.map((d) => (d.courseId === courseId ? { ...d, isCompleted: true } : d))
+    )
+  }
+
   const markAllPostsReadForDiscussion = (discussionId: string) => {
     setDiscussionPosts((prev) =>
       prev.map((p) => (p.discussionId === discussionId ? { ...p, isNew: false } : p))
@@ -191,6 +205,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         getDiscussion,
         getPostsForDiscussion,
         addPost,
+        markDiscussionRead,
+        markAllDiscussionsReadForCourse,
         markAllPostsReadForDiscussion,
         getAssignmentsForCourse,
         getAssignment,
