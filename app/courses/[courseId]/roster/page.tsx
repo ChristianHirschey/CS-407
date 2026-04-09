@@ -56,6 +56,9 @@ export default function RosterPage({ params }: RosterPageProps) {
       member.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const allRosterMembersSelected =
+    rosterMembers.length > 0 && selectedMembers.length === rosterMembers.length
+
   const toggleMemberSelection = (memberId: string) => {
     setSelectedMembers((prev) =>
       prev.includes(memberId)
@@ -119,6 +122,10 @@ export default function RosterPage({ params }: RosterPageProps) {
                 variant="outline"
                 onClick={() => setIsMessageDialogOpen(true)}
                 disabled={selectedMembers.length === 0}
+                className={cn(
+                  selectedMembers.length > 0 &&
+                    "border-purple-600 bg-purple-600 text-white hover:bg-purple-700 hover:text-white"
+                )}
               >
                 Message
               </Button>
@@ -128,25 +135,34 @@ export default function RosterPage({ params }: RosterPageProps) {
 
         <div className="p-6">
           <div className="mb-4 flex items-center justify-between">
-            <div className="flex gap-1 rounded border border-zinc-200 p-1">
-              <button
-                onClick={() => setViewMode("grid")}
-                className={cn(
-                  "rounded p-1.5",
-                  viewMode === "grid" ? "bg-zinc-100" : "hover:bg-zinc-50"
-                )}
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1 rounded border border-zinc-200 p-1">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={cn(
+                    "rounded p-1.5",
+                    viewMode === "grid" ? "bg-zinc-100" : "hover:bg-zinc-50"
+                  )}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={cn(
+                    "rounded p-1.5",
+                    viewMode === "list" ? "bg-zinc-100" : "hover:bg-zinc-50"
+                  )}
+                >
+                  <List className="h-4 w-4" />
+                </button>
+              </div>
+              <Button
+                variant="outline"
+                onClick={selectAllMembers}
+                disabled={allRosterMembersSelected}
               >
-                <LayoutGrid className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={cn(
-                  "rounded p-1.5",
-                  viewMode === "list" ? "bg-zinc-100" : "hover:bg-zinc-50"
-                )}
-              >
-                <List className="h-4 w-4" />
-              </button>
+                Select all
+              </Button>
             </div>
 
             <button className="flex items-center gap-1 text-sm text-muted-foreground">
