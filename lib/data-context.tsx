@@ -52,6 +52,7 @@ interface DataContextType {
   getDiscussionsForCourse: (courseId: string) => Discussion[]
   getDiscussion: (id: string) => Discussion | undefined
   getPostsForDiscussion: (discussionId: string) => DiscussionPost[]
+  toggleDiscussionFavorite: (discussionId: string) => void
   addPost: (discussionId: string, content: string) => void
   markDiscussionRead: (id: string) => void
   markAllDiscussionsReadForCourse: (courseId: string) => void
@@ -126,6 +127,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const getPostsForDiscussion = (discussionId: string) =>
     discussionPosts.filter((p) => p.discussionId === discussionId)
+
+  const toggleDiscussionFavorite = (discussionId: string) => {
+    setDiscussions((prev) =>
+      prev.map((discussion) =>
+        discussion.id === discussionId
+          ? { ...discussion, isFavorite: !discussion.isFavorite }
+          : discussion
+      )
+    )
+  }
 
   const addPost = (discussionId: string, content: string) => {
     const newPost: DiscussionPost = {
@@ -204,6 +215,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         getDiscussionsForCourse,
         getDiscussion,
         getPostsForDiscussion,
+        toggleDiscussionFavorite,
         addPost,
         markDiscussionRead,
         markAllDiscussionsReadForCourse,
