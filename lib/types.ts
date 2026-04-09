@@ -39,6 +39,7 @@ export interface Discussion {
   title: string
   description: string
   dueDate: string
+  isFavorite: boolean
   isCompleted: boolean
   totalPosts: number
   totalReplies: number

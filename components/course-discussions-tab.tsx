@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Circle,
   Folder,
+  Star,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useData } from "@/lib/data-context"
@@ -25,10 +26,14 @@ export function CourseDiscussionsTab({
     getPostsForDiscussion,
     markAllPostsReadForDiscussion,
     markAllDiscussionsReadForCourse,
+    toggleDiscussionFavorite,
   } = useData()
 
   const unreadCount = discussions.filter((discussion) => !discussion.isCompleted).length
   const totalCount = discussions.length
+  const sortedDiscussions = [...discussions].sort(
+    (a, b) => Number(b.isFavorite) - Number(a.isFavorite)
+  )
   const hasUnreadPosts = discussions.some((discussion) =>
     getPostsForDiscussion(discussion.id).some((post) => post.isNew)
   )
@@ -55,7 +60,7 @@ export function CourseDiscussionsTab({
           Mark all as Read
         </Button>
       </div>
-      {discussions.map((discussion) => (
+      {sortedDiscussions.map((discussion) => (
         <Link
           key={discussion.id}
           href={`/courses/${courseId}/discussions/${discussion.id}`}
@@ -83,8 +88,40 @@ export function CourseDiscussionsTab({
                 <Circle className="h-2 w-2 fill-purple-500 text-purple-500" />
               )}
               <button
+                type="button"
+                className={
+                  discussion.isFavorite
+                    ? "text-purple-500 transition-colors hover:text-purple-600"
+                    : "text-muted-foreground transition-colors hover:text-foreground"
+                }
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggleDiscussionFavorite(discussion.id)
+                }}
+                aria-label={
+                  discussion.isFavorite
+                    ? "Remove discussion from favorites"
+                    : "Add discussion to favorites"
+                }
+                title={
+                  discussion.isFavorite
+                    ? "Remove from favorites"
+                    : "Add to favorites"
+                }
+              >
+                <Star
+                  className="h-5 w-5"
+                  fill={discussion.isFavorite ? "currentColor" : "none"}
+                />
+              </button>
+              <button
+                type="button"
                 className="text-muted-foreground hover:text-foreground"
-                onClick={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
               >
                 <MoreHorizontal className="h-5 w-5" />
               </button>
