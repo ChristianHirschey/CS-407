@@ -40,6 +40,7 @@ export interface Discussion {
   description: string
   dueDate: string
   isFavorite: boolean
+  isMuted?: boolean
   isCompleted: boolean
   totalPosts: number
   totalReplies: number

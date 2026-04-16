@@ -39,7 +39,7 @@ export default function CoursePage({ params }: CoursePageProps) {
   const announcements = getAnnouncementsForCourse(courseId)
   const discussions = getDiscussionsForCourse(courseId)
   const events = getEventsForCourse(courseId)
-  const unreadDiscussions = discussions.filter((d) => !d.isCompleted).length
+  const unreadDiscussions = discussions.filter((d) => !d.isCompleted && !d.isMuted).length
   const unreadAnnouncements = announcements.filter((a) => !a.isRead).length
 
   const renderTabContent = () => {

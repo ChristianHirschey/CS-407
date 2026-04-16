@@ -53,6 +53,7 @@ interface DataContextType {
   getDiscussion: (id: string) => Discussion | undefined
   getPostsForDiscussion: (discussionId: string) => DiscussionPost[]
   toggleDiscussionFavorite: (discussionId: string) => void
+  toggleDiscussionMute: (discussionId: string) => void
   addPost: (discussionId: string, content: string) => void
   markDiscussionRead: (id: string) => void
   markAllDiscussionsReadForCourse: (courseId: string) => void
@@ -138,6 +139,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
     )
   }
 
+  const toggleDiscussionMute = (discussionId: string) => {
+    setDiscussions((prev) =>
+      prev.map((discussion) =>
+        discussion.id === discussionId
+          ? { ...discussion, isMuted: !(discussion.isMuted ?? false) }
+          : discussion
+      )
+    )
+  }
+
   const addPost = (discussionId: string, content: string) => {
     const newPost: DiscussionPost = {
       id: `post-${Date.now()}`,
@@ -216,6 +227,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         getDiscussion,
         getPostsForDiscussion,
         toggleDiscussionFavorite,
+        toggleDiscussionMute,
         addPost,
         markDiscussionRead,
         markAllDiscussionsReadForCourse,

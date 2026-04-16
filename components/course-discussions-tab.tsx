@@ -8,10 +8,13 @@ import {
   Circle,
   Folder,
   Star,
+  Bell,
+  BellOff,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useData } from "@/lib/data-context"
 import type { Discussion } from "@/lib/types"
+import { cn } from "@/lib/utils"
 
 interface CourseDiscussionsTabProps {
   courseId: string
@@ -27,9 +30,12 @@ export function CourseDiscussionsTab({
     markAllPostsReadForDiscussion,
     markAllDiscussionsReadForCourse,
     toggleDiscussionFavorite,
+    toggleDiscussionMute,
   } = useData()
 
-  const unreadCount = discussions.filter((discussion) => !discussion.isCompleted).length
+  const unreadCount = discussions.filter(
+    (discussion) => !discussion.isCompleted && !discussion.isMuted
+  ).length
   const totalCount = discussions.length
   const sortedDiscussions = [...discussions].sort(
     (a, b) => Number(b.isFavorite) - Number(a.isFavorite)
@@ -64,7 +70,12 @@ export function CourseDiscussionsTab({
         <Link
           key={discussion.id}
           href={`/courses/${courseId}/discussions/${discussion.id}`}
-          className="block rounded-lg border border-zinc-200 bg-white p-4 hover:shadow-sm transition-shadow"
+          className={cn(
+            "block rounded-lg border border-zinc-200 p-4 transition-shadow hover:shadow-sm",
+            discussion.isMuted
+              ? "bg-zinc-50 text-muted-foreground"
+              : "bg-white"
+          )}
         >
           <div className="flex items-start gap-3">
             <div className="mt-1">
@@ -75,7 +86,12 @@ export function CourseDiscussionsTab({
               )}
             </div>
             <div className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              <MessageSquare
+                className={cn(
+                  "h-5 w-5",
+                  discussion.isMuted ? "text-zinc-400" : "text-muted-foreground"
+                )}
+              />
               <h3 className="font-medium">{discussion.title}</h3>
               {discussion.grade && (
                 <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
@@ -85,7 +101,39 @@ export function CourseDiscussionsTab({
             </div>
             <div className="ml-auto flex items-center gap-2">
               {!discussion.isCompleted && (
-                <Circle className="h-2 w-2 fill-purple-500 text-purple-500" />
+                <Circle
+                  className={cn(
+                    "h-2 w-2",
+                    discussion.isMuted
+                      ? "fill-zinc-400 text-zinc-400"
+                      : "fill-purple-500 text-purple-500"
+                  )}
+                />
+              )}
+              <button
+                type="button"
+                className={cn(
+                  "rounded p-1 transition-colors",
+                  discussion.isMuted
+                    ? "text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700"
+                    : "text-muted-foreground hover:bg-zinc-100 hover:text-foreground"
+                )}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggleDiscussionMute(discussion.id)
+                }}
+                aria-label={discussion.isMuted ? "Unmute discussion" : "Mute discussion"}
+                title={discussion.isMuted ? "Unmute discussion" : "Mute discussion"}
+              >
+                {discussion.isMuted ? (
+                  <BellOff className="h-4 w-4" />
+                ) : (
+                  <Bell className="h-4 w-4" />
+                )}
+              </button>
+              {!discussion.isCompleted && discussion.isMuted && (
+                <span className="text-[11px] font-medium text-zinc-500">Unread</span>
               )}
               <button
                 type="button"
@@ -130,7 +178,13 @@ export function CourseDiscussionsTab({
           <div className="mt-2 ml-8">
             <p className="text-sm text-muted-foreground">
               Due date:{" "}
-              <span className="text-purple-600">{discussion.dueDate}</span>
+              <span
+                className={cn(
+                  discussion.isMuted ? "text-zinc-500" : "text-purple-600"
+                )}
+              >
+                {discussion.dueDate}
+              </span>
             </p>
             <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
               {discussion.description}
