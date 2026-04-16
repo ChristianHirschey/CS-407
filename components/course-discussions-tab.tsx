@@ -3,10 +3,8 @@
 import Link from "next/link"
 import {
   MessageSquare,
-  MoreHorizontal,
   CheckCircle2,
   Circle,
-  Folder,
   Star,
   Bell,
   BellOff,
@@ -132,9 +130,6 @@ export function CourseDiscussionsTab({
                   <Bell className="h-4 w-4" />
                 )}
               </button>
-              {!discussion.isCompleted && discussion.isMuted && (
-                <span className="text-[11px] font-medium text-zinc-500">Unread</span>
-              )}
               <button
                 type="button"
                 className={
@@ -163,16 +158,6 @@ export function CourseDiscussionsTab({
                   fill={discussion.isFavorite ? "currentColor" : "none"}
                 />
               </button>
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              >
-                <MoreHorizontal className="h-5 w-5" />
-              </button>
             </div>
           </div>
           <div className="mt-2 ml-8">
@@ -192,17 +177,6 @@ export function CourseDiscussionsTab({
           </div>
         </Link>
       ))}
-      <div className="rounded-lg border border-zinc-200 bg-white p-4">
-        <div className="flex items-start gap-3">
-          <Folder className="mt-0.5 h-5 w-5 text-muted-foreground" />
-          <div>
-            <h3 className="font-medium">Folder</h3>
-            <p className="text-sm text-muted-foreground">
-              Select the title to access the discussion.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
