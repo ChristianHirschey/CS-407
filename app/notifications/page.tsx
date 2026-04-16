@@ -3,6 +3,7 @@
 import Link from "next/link"
 import {
   Bell,
+  BellOff,
   Megaphone,
   GraduationCap,
   MessageSquare,
@@ -15,6 +16,13 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { Button } from "@/components/ui/button"
 import { useData } from "@/lib/data-context"
 import { cn } from "@/lib/utils"
+
+function getDiscussionIdFromLink(link?: string): string | null {
+  if (!link) return null
+  // Expected: /courses/:courseId/discussions/:discussionId
+  const match = link.match(/\/discussions\/([^/?#]+)/i)
+  return match?.[1] ?? null
+}
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
@@ -51,8 +59,14 @@ const getNotificationColor = (type: string) => {
 }
 
 export default function NotificationsPage() {
-  const { notifications, markNotificationRead, markAllNotificationsRead, unreadNotificationCount } =
-    useData()
+  const {
+    notifications,
+    getDiscussion,
+    toggleDiscussionMute,
+    markNotificationRead,
+    markAllNotificationsRead,
+    unreadNotificationCount,
+  } = useData()
 
   const sortedNotifications = [...notifications].sort((a, b) => {
     if (a.isRead === b.isRead) return 0
@@ -135,6 +149,30 @@ export default function NotificationsPage() {
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
+                        {(() => {
+                          const discussionId = getDiscussionIdFromLink(notification.link)
+                          if (!discussionId) return null
+                          const discussion = getDiscussion(discussionId)
+                          if (!discussion) return null
+                          const muted = discussion.isMuted ?? false
+                          return (
+                            <button
+                              onClick={() => toggleDiscussionMute(discussionId)}
+                              className={cn(
+                                "rounded p-1 text-muted-foreground hover:bg-zinc-100 hover:text-foreground",
+                                muted && "text-zinc-500"
+                              )}
+                              title={muted ? "Unmute discussion" : "Mute discussion"}
+                              aria-label={muted ? "Unmute discussion" : "Mute discussion"}
+                            >
+                              {muted ? (
+                                <BellOff className="h-4 w-4" />
+                              ) : (
+                                <Bell className="h-4 w-4" />
+                              )}
+                            </button>
+                          )
+                        })()}
                         <span className="text-xs text-muted-foreground whitespace-nowrap">
                           {notification.createdAt}
                         </span>
