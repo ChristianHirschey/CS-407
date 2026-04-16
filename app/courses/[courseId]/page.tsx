@@ -63,19 +63,19 @@ export default function CoursePage({ params }: CoursePageProps) {
       case "gradebook":
         return (
           <div className="flex h-64 items-center justify-center text-muted-foreground">
-            Gradebook coming soon
+            Gradebook will not be implemented for the purposes of this demo
           </div>
         )
       case "messages":
         return (
           <div className="flex h-64 items-center justify-center text-muted-foreground">
-            Messages coming soon
+            Messages will not be implemented for the purposes of this demo
           </div>
         )
       case "groups":
         return (
           <div className="flex h-64 items-center justify-center text-muted-foreground">
-            Groups coming soon
+            Groups will not be implemented for the purposes of this demo
           </div>
         )
       default:
